@@ -135,6 +135,128 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
     case "Give Item":
       console.log("Give Item was clicked!");
       alert("You selected 'Give Item'!");
+function unlockSpecificItem() {
+  // Prompt the user for the item category
+  const itemCategory = prompt(
+    "Which item category would you like? Options: weapon, outfit, hat, relic, fossil, item, boots, spellRelic, currency, follow, mount, key, emote, mathTownInterior, mathTownFrame"
+  );
+
+  // Ensure the user entered a valid category
+  const validCategories = [
+    "weapon",
+    "outfit",
+    "hat",
+    "relic",
+    "fossil",
+    "item",
+    "boots",
+    "spellRelic",
+    "currency",
+    "follow",
+    "mount",
+    "key",
+    "emote",
+    "mathTownInterior",
+    "mathTownFrame",
+  ];
+
+  if (!validCategories.includes(itemCategory)) {
+    alert("Invalid category. Please try again.");
+    return;
+  }
+
+  // Prompt the user for the quantity
+  const quantity = parseInt(prompt("How many of this item do you want? (Enter a number)"), 10);
+  if (isNaN(quantity) || quantity <= 0) {
+    alert("Invalid quantity. Please enter a positive number.");
+    return;
+  }
+
+  // Access game data
+  const gameData = Boot.prototype.game._state._states.get("Boot")._gameData;
+  const userBackpack = Boot.prototype.game._state._current.user.source.data.backpack;
+
+  // Helper function to process items
+  function processItemData(data, quantity) {
+    const items = [];
+    data.forEach((item) => {
+      items.push({ N: quantity.toString(), ID: item.ID });
+    });
+    return items;
+  }
+
+  // Process the chosen category
+  const chosenCategoryData = gameData[itemCategory];
+  if (!chosenCategoryData) {
+    alert("No data found for the chosen category.");
+    return;
+  }
+
+  const processedItems = processItemData(chosenCategoryData, quantity);
+
+  // Update the user's backpack
+  userBackpack[itemCategory] = processedItems;
+
+  // Save the new data to local storage
+  const localStorageKey = `prodigy_${itemCategory}_data`;
+  localStorage.setItem(localStorageKey, JSON.stringify(processedItems));
+
+  alert(
+    `Successfully unlocked ${quantity} of each item in the ${itemCategory} category! Data has been saved to local storage.`
+  );
+}
+
+// Function to retrieve saved data
+function retrieveSavedData() {
+  // Prompt the user for the item category they want to retrieve
+  const itemCategory = prompt(
+    "Which saved item category would you like to view? Options: weapon, outfit, hat, relic, fossil, item, boots, spellRelic, currency, follow, mount, key, emote, mathTownInterior, mathTownFrame"
+  );
+
+  // Ensure the user entered a valid category
+  const validCategories = [
+    "weapon",
+    "outfit",
+    "hat",
+    "relic",
+    "fossil",
+    "item",
+    "boots",
+    "spellRelic",
+    "currency",
+    "follow",
+    "mount",
+    "key",
+    "emote",
+    "mathTownInterior",
+    "mathTownFrame",
+  ];
+
+  if (!validCategories.includes(itemCategory)) {
+    alert("Invalid category. Please try again.");
+    return;
+  }
+
+  // Retrieve the saved data from local storage
+  const localStorageKey = `prodigy_${itemCategory}_data`;
+  const savedData = JSON.parse(localStorage.getItem(localStorageKey));
+
+  if (!savedData) {
+    alert(`No saved data found for the ${itemCategory} category.`);
+    return;
+  }
+
+  // Display the retrieved data in the console
+  console.log(`Retrieved data for ${itemCategory}:`, savedData);
+  alert(`The saved data for ${itemCategory} has been logged to the console.`);
+}
+
+// Call the function to unlock items
+unlockSpecificItem();
+
+// Optionally, you can call the retrieveSavedData function to view saved data
+// Uncomment the following line to test the retrieval functionality:
+// retrieveSavedData();
       break;
     default:
       console.log("Unknown option selected");
