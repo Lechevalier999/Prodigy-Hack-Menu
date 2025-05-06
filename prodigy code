@@ -1,0 +1,1580 @@
+!(function (t, e) {
+    "object" == typeof exports && "object" == typeof module
+        ? (module.exports = e())
+        : "function" == typeof define && define.amd
+        ? define([], e)
+        : "object" == typeof exports
+        ? (exports.prodigyExperiments = e())
+        : (t.prodigyExperiments = e());
+})("undefined" != typeof self ? self : this, () =>
+    (() => {
+        "use strict";
+        var t = {
+                d: (e, r) => {
+                    for (var n in r) t.o(r, n) && !t.o(e, n) && Object.defineProperty(e, n, { enumerable: !0, get: r[n] });
+                },
+                o: (t, e) => Object.prototype.hasOwnProperty.call(t, e),
+                r: (t) => {
+                    "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(t, Symbol.toStringTag, { value: "Module" }), Object.defineProperty(t, "__esModule", { value: !0 });
+                },
+            },
+            e = {};
+        t.r(e), t.d(e, { EFeatureProvider: () => Vt, FeatureFactory: () => Ot, GrowthBookFeatureProvider: () => Rt, setPolyfills: () => h });
+        const r = { staleTTL: 6e4, maxAge: 864e5, cacheKey: "gbFeaturesCache", backgroundSync: !0, maxEntries: 10, disableIdleStreams: !1, idleStreamInterval: 2e4 },
+            n = { fetch: globalThis.fetch ? globalThis.fetch.bind(globalThis) : void 0, SubtleCrypto: globalThis.crypto ? globalThis.crypto.subtle : void 0, EventSource: globalThis.EventSource },
+            i = {
+                fetchFeaturesCall: (t) => {
+                    let { host: e, clientKey: r, headers: i } = t;
+                    return n.fetch("".concat(e, "/api/features/").concat(r), { headers: i });
+                },
+                fetchRemoteEvalCall: (t) => {
+                    let { host: e, clientKey: r, payload: i, headers: s } = t;
+                    const o = { method: "POST", headers: { "Content-Type": "application/json", ...s }, body: JSON.stringify(i) };
+                    return n.fetch("".concat(e, "/api/eval/").concat(r), o);
+                },
+                eventSourceCall: (t) => {
+                    let { host: e, clientKey: r, headers: i } = t;
+                    return i ? new n.EventSource("".concat(e, "/sub/").concat(r), { headers: i }) : new n.EventSource("".concat(e, "/sub/").concat(r));
+                },
+                startIdleListener: () => {
+                    let t;
+                    if ("undefined" == typeof window || "undefined" == typeof document) return;
+                    const e = () => {
+                        "visible" === document.visibilityState
+                            ? (window.clearTimeout(t),
+                              c.forEach((t) => {
+                                  t && "idle" === t.state && w(t);
+                              }))
+                            : "hidden" === document.visibilityState && (t = window.setTimeout(d, r.idleStreamInterval));
+                    };
+                    return document.addEventListener("visibilitychange", e), () => document.removeEventListener("visibilitychange", e);
+                },
+                stopIdleListener: () => {},
+            };
+        try {
+            globalThis.localStorage && (n.localStorage = globalThis.localStorage);
+        } catch (Tt) {}
+        const s = new Map();
+        let o = !1;
+        const a = new Map(),
+            u = new Map(),
+            c = new Map(),
+            l = new Set();
+        function h(t) {
+            Object.assign(n, t);
+        }
+        async function f(t, e, s, u, c, h) {
+            h || (r.backgroundSync = !1);
+            const f = await (async function (t, e, s, u) {
+                const c = y(t),
+                    h = _(t),
+                    f = new Date(),
+                    d = new Date(f.getTime() - r.maxAge + r.staleTTL);
+                await (async function () {
+                    if (!o) {
+                        o = !0;
+                        try {
+                            if (n.localStorage) {
+                                const t = await n.localStorage.getItem(r.cacheKey);
+                                if (t) {
+                                    const e = JSON.parse(t);
+                                    e &&
+                                        Array.isArray(e) &&
+                                        e.forEach((t) => {
+                                            let [e, r] = t;
+                                            a.set(e, { ...r, staleAt: new Date(r.staleAt) });
+                                        }),
+                                        g();
+                                }
+                            }
+                        } catch (Tt) {}
+                        if (!r.disableIdleStreams) {
+                            const t = i.startIdleListener();
+                            t && (i.stopIdleListener = t);
+                        }
+                    }
+                })();
+                const p = a.get(h);
+                return p && !u && (e || p.staleAt > f) && p.staleAt > d
+                    ? (p.sse && l.add(c), p.staleAt < f ? b(t) : k(t), p.data)
+                    : await (function (t, e) {
+                          return new Promise((r) => {
+                              let n,
+                                  i = !1;
+                              const s = (t) => {
+                                  i || ((i = !0), n && clearTimeout(n), r(t || null));
+                              };
+                              e && (n = setTimeout(() => s(), e)), t.then((t) => s(t)).catch(() => s());
+                          });
+                      })(b(t), s);
+            })(t, u, e, s);
+            c && f && (await v(t, f));
+        }
+        function d() {
+            c.forEach((t) => {
+                t && ((t.state = "idle"), A(t));
+            });
+        }
+        async function p() {
+            try {
+                if (!n.localStorage) return;
+                await n.localStorage.setItem(r.cacheKey, JSON.stringify(Array.from(a.entries())));
+            } catch (Tt) {}
+        }
+        function y(t) {
+            const [e, r] = t.getApiInfo();
+            return "".concat(e, "||").concat(r);
+        }
+        function _(t) {
+            const e = y(t);
+            if (!t.isRemoteEval()) return e;
+            const r = t.getAttributes(),
+                n = t.getCacheKeyAttributes() || Object.keys(t.getAttributes()),
+                i = {};
+            n.forEach((t) => {
+                i[t] = r[t];
+            });
+            const s = t.getForcedVariations(),
+                o = t.getUrl();
+            return "".concat(e, "||").concat(JSON.stringify({ ca: i, fv: s, url: o }));
+        }
+        function g() {
+            const t = Array.from(a.entries())
+                    .map((t) => {
+                        let [e, r] = t;
+                        return { key: e, staleAt: r.staleAt.getTime() };
+                    })
+                    .sort((t, e) => t.staleAt - e.staleAt),
+                e = Math.min(Math.max(0, a.size - r.maxEntries), a.size);
+            for (let r = 0; r < e; r++) a.delete(t[r].key);
+        }
+        function m(t, e, n) {
+            const i = n.dateUpdated || "",
+                o = new Date(Date.now() + r.staleTTL),
+                u = a.get(e);
+            if (u && i && u.version === i) return (u.staleAt = o), void p();
+            a.set(e, { data: n, version: i, staleAt: o, sse: l.has(t) }), g(), p();
+            const c = s.get(t);
+            c && c.forEach((t) => v(t, n));
+        }
+        async function v(t, e) {
+            (e = await t.decryptPayload(e, void 0, n.SubtleCrypto)), await t.refreshStickyBuckets(e), t.setExperiments(e.experiments || t.getExperiments()), t.setFeatures(e.features || t.getFeatures());
+        }
+        async function b(t) {
+            const { apiHost: e, apiRequestHeaders: r } = t.getApiHosts(),
+                n = t.getClientKey(),
+                s = t.isRemoteEval(),
+                o = y(t),
+                a = _(t);
+            let c = u.get(a);
+            return (
+                c ||
+                    ((c = (s
+                        ? i.fetchRemoteEvalCall({
+                              host: e,
+                              clientKey: n,
+                              payload: { attributes: t.getAttributes(), forcedVariations: t.getForcedVariations(), forcedFeatures: Array.from(t.getForcedFeatures().entries()), url: t.getUrl() },
+                              headers: r,
+                          })
+                        : i.fetchFeaturesCall({ host: e, clientKey: n, headers: r })
+                    )
+                        .then((t) => {
+                            if (!t.ok) throw new Error("HTTP error: ".concat(t.status));
+                            return "enabled" === t.headers.get("x-sse-support") && l.add(o), t.json();
+                        })
+                        .then((e) => (m(o, a, e), k(t), u.delete(a), e))
+                        .catch((t) => (u.delete(a), Promise.resolve({})))),
+                    u.set(a, c)),
+                await c
+            );
+        }
+        function k(t) {
+            const e = y(t),
+                i = _(t),
+                { streamingHost: o, streamingHostRequestHeaders: a } = t.getApiHosts(),
+                u = t.getClientKey();
+            if (r.backgroundSync && l.has(e) && n.EventSource) {
+                if (c.has(e)) return;
+                const t = {
+                    src: null,
+                    host: o,
+                    clientKey: u,
+                    headers: a,
+                    cb: (r) => {
+                        try {
+                            if ("features-updated" === r.type) {
+                                const t = s.get(e);
+                                t &&
+                                    t.forEach((t) => {
+                                        b(t);
+                                    });
+                            } else if ("features" === r.type) {
+                                const t = JSON.parse(r.data);
+                                m(e, i, t);
+                            }
+                            t.errors = 0;
+                        } catch (Tt) {
+                            x(t);
+                        }
+                    },
+                    errors: 0,
+                    state: "active",
+                };
+                c.set(e, t), w(t);
+            }
+        }
+        function x(t) {
+            if ("idle" !== t.state && (t.errors++, t.errors > 3 || (t.src && 2 === t.src.readyState))) {
+                const e = Math.pow(3, t.errors - 3) * (1e3 + 1e3 * Math.random());
+                A(t),
+                    setTimeout(() => {
+                        ["idle", "active"].includes(t.state) || w(t);
+                    }, Math.min(e, 3e5));
+            }
+        }
+        function A(t) {
+            t.src && ((t.src.onopen = null), (t.src.onerror = null), t.src.close(), (t.src = null), "active" === t.state && (t.state = "disabled"));
+        }
+        function w(t) {
+            (t.src = i.eventSourceCall({ host: t.host, clientKey: t.clientKey, headers: t.headers })),
+                (t.state = "active"),
+                t.src.addEventListener("features", t.cb),
+                t.src.addEventListener("features-updated", t.cb),
+                (t.src.onerror = () => x(t)),
+                (t.src.onopen = () => {
+                    t.errors = 0;
+                });
+        }
+        var E = function (t, e) {
+            return (E =
+                Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array &&
+                    function (t, e) {
+                        t.__proto__ = e;
+                    }) ||
+                function (t, e) {
+                    for (var r in e) Object.prototype.hasOwnProperty.call(e, r) && (t[r] = e[r]);
+                })(t, e);
+        };
+        var S = function () {
+            return (S =
+                Object.assign ||
+                function (t) {
+                    for (var e, r = 1, n = arguments.length; r < n; r++) for (var i in (e = arguments[r])) Object.prototype.hasOwnProperty.call(e, i) && (t[i] = e[i]);
+                    return t;
+                }).apply(this, arguments);
+        };
+        function F(t, e, r, n) {
+            return new (r || (r = Promise))(function (i, s) {
+                function o(t) {
+                    try {
+                        u(n.next(t));
+                    } catch (Tt) {
+                        s(Tt);
+                    }
+                }
+                function a(t) {
+                    try {
+                        u(n.throw(t));
+                    } catch (Tt) {
+                        s(Tt);
+                    }
+                }
+                function u(t) {
+                    var e;
+                    t.done
+                        ? i(t.value)
+                        : ((e = t.value),
+                          e instanceof r
+                              ? e
+                              : new r(function (t) {
+                                    t(e);
+                                })).then(o, a);
+                }
+                u((n = n.apply(t, e || [])).next());
+            });
+        }
+        function B(t, e) {
+            var r,
+                n,
+                i,
+                s,
+                o = {
+                    label: 0,
+                    sent: function () {
+                        if (1 & i[0]) throw i[1];
+                        return i[1];
+                    },
+                    trys: [],
+                    ops: [],
+                };
+            return (
+                (s = { next: a(0), throw: a(1), return: a(2) }),
+                "function" == typeof Symbol &&
+                    (s[Symbol.iterator] = function () {
+                        return this;
+                    }),
+                s
+            );
+            function a(a) {
+                return function (u) {
+                    return (function (a) {
+                        if (r) throw new TypeError("Generator is already executing.");
+                        for (; s && ((s = 0), a[0] && (o = 0)), o; )
+                            try {
+                                if (((r = 1), n && (i = 2 & a[0] ? n.return : a[0] ? n.throw || ((i = n.return) && i.call(n), 0) : n.next) && !(i = i.call(n, a[1])).done)) return i;
+                                switch (((n = 0), i && (a = [2 & a[0], i.value]), a[0])) {
+                                    case 0:
+                                    case 1:
+                                        i = a;
+                                        break;
+                                    case 4:
+                                        return o.label++, { value: a[1], done: !1 };
+                                    case 5:
+                                        o.label++, (n = a[1]), (a = [0]);
+                                        continue;
+                                    case 7:
+                                        (a = o.ops.pop()), o.trys.pop();
+                                        continue;
+                                    default:
+                                        if (!((i = (i = o.trys).length > 0 && i[i.length - 1]) || (6 !== a[0] && 2 !== a[0]))) {
+                                            o = 0;
+                                            continue;
+                                        }
+                                        if (3 === a[0] && (!i || (a[1] > i[0] && a[1] < i[3]))) {
+                                            o.label = a[1];
+                                            break;
+                                        }
+                                        if (6 === a[0] && o.label < i[1]) {
+                                            (o.label = i[1]), (i = a);
+                                            break;
+                                        }
+                                        if (i && o.label < i[2]) {
+                                            (o.label = i[2]), o.ops.push(a);
+                                            break;
+                                        }
+                                        i[2] && o.ops.pop(), o.trys.pop();
+                                        continue;
+                                }
+                                a = e.call(t, o);
+                            } catch (Tt) {
+                                (a = [6, Tt]), (n = 0);
+                            } finally {
+                                r = i = 0;
+                            }
+                        if (5 & a[0]) throw a[1];
+                        return { value: a[0] ? a[1] : void 0, done: !0 };
+                    })([a, u]);
+                };
+            }
+        }
+        Object.create, Object.create, "function" == typeof SuppressedError && SuppressedError;
+        var V = /^[a-zA-Z:_][a-zA-Z0-9:_.-]*$/,
+            R = { revert: function () {} },
+            O = new Map(),
+            T = new Set();
+        function C(t) {
+            var e = O.get(t);
+            return e || ((e = { element: t, attributes: {} }), O.set(t, e)), e;
+        }
+        function $(t, e, r, n, i) {
+            var s = r(t),
+                o = {
+                    isDirty: !1,
+                    originalValue: s,
+                    virtualValue: s,
+                    mutations: [],
+                    el: t,
+                    _positionTimeout: null,
+                    observer: new MutationObserver(function () {
+                        if ("position" !== e || !o._positionTimeout) {
+                            "position" === e &&
+                                (o._positionTimeout = setTimeout(function () {
+                                    o._positionTimeout = null;
+                                }, 1e3));
+                            var n = r(t);
+                            ("position" === e && n.parentNode === o.virtualValue.parentNode && n.insertBeforeNode === o.virtualValue.insertBeforeNode) || (n !== o.virtualValue && ((o.originalValue = n), i(o)));
+                        }
+                    }),
+                    mutationRunner: i,
+                    setValue: n,
+                    getCurrentValue: r,
+                };
+            return (
+                "position" === e && t.parentNode
+                    ? o.observer.observe(t.parentNode, { childList: !0, subtree: !0, attributes: !1, characterData: !1 })
+                    : o.observer.observe(
+                          t,
+                          (function (t) {
+                              return "html" === t ? { childList: !0, subtree: !0, attributes: !0, characterData: !0 } : { childList: !1, subtree: !1, attributes: !0, attributeFilter: [t] };
+                          })(e)
+                      ),
+                o
+            );
+        }
+        function K(t, e) {
+            var r = e.getCurrentValue(e.el);
+            (e.virtualValue = t), t && "string" != typeof t ? (r && t.parentNode === r.parentNode && t.insertBeforeNode === r.insertBeforeNode) || ((e.isDirty = !0), tt()) : t !== r && ((e.isDirty = !0), tt());
+        }
+        function N(t) {
+            var e = t.originalValue;
+            t.mutations.forEach(function (t) {
+                return (e = t.mutate(e));
+            }),
+                K(
+                    (function (t) {
+                        return J || (J = document.createElement("div")), (J.innerHTML = t), J.innerHTML;
+                    })(e),
+                    t
+                );
+        }
+        function I(t) {
+            var e = new Set(t.originalValue.split(/\s+/).filter(Boolean));
+            t.mutations.forEach(function (t) {
+                return t.mutate(e);
+            }),
+                K(Array.from(e).filter(Boolean).join(" "), t);
+        }
+        function H(t) {
+            var e = t.originalValue;
+            t.mutations.forEach(function (t) {
+                return (e = t.mutate(e));
+            }),
+                K(e, t);
+        }
+        function M(t) {
+            var e = t.originalValue;
+            t.mutations.forEach(function (t) {
+                var r = (function (t) {
+                    var e = t.parentSelector,
+                        r = t.insertBeforeSelector,
+                        n = document.querySelector(e);
+                    if (!n) return null;
+                    var i = r ? document.querySelector(r) : null;
+                    return r && !i ? null : { parentNode: n, insertBeforeNode: i };
+                })(t.mutate());
+                e = r || e;
+            }),
+                K(e, t);
+        }
+        var j = function (t) {
+                return t.innerHTML;
+            },
+            P = function (t, e) {
+                return (t.innerHTML = e);
+            };
+        function D(t) {
+            var e = C(t);
+            return e.html || (e.html = $(t, "html", j, P, N)), e.html;
+        }
+        var L = function (t) {
+                return { parentNode: t.parentElement, insertBeforeNode: t.nextElementSibling };
+            },
+            U = function (t, e) {
+                (e.insertBeforeNode && !e.parentNode.contains(e.insertBeforeNode)) || e.parentNode.insertBefore(t, e.insertBeforeNode);
+            };
+        function q(t) {
+            var e = C(t);
+            return e.position || (e.position = $(t, "position", L, U, M)), e.position;
+        }
+        var J,
+            z,
+            G = function (t, e) {
+                return e ? (t.className = e) : t.removeAttribute("class");
+            },
+            Q = function (t) {
+                return t.className;
+            };
+        function Z(t) {
+            var e = C(t);
+            return e.classes || (e.classes = $(t, "class", Q, G, I)), e.classes;
+        }
+        function W(t, e) {
+            var r,
+                n = C(t);
+            return (
+                n.attributes[e] ||
+                    (n.attributes[e] = $(
+                        t,
+                        e,
+                        ((r = e),
+                        function (t) {
+                            var e;
+                            return null != (e = t.getAttribute(r)) ? e : null;
+                        }),
+                        (function (t) {
+                            return function (e, r) {
+                                return null !== r ? e.setAttribute(t, r) : e.removeAttribute(t);
+                            };
+                        })(e),
+                        H
+                    )),
+                n.attributes[e]
+            );
+        }
+        function X(t, e, r) {
+            if (r.isDirty) {
+                r.isDirty = !1;
+                var n = r.virtualValue;
+                r.mutations.length ||
+                    (function (t, e) {
+                        var r,
+                            n,
+                            i = O.get(t);
+                        if (i)
+                            if ("html" === e) null == (r = i.html) || null == (n = r.observer) || n.disconnect(), delete i.html;
+                            else if ("class" === e) {
+                                var s, o;
+                                null == (s = i.classes) || null == (o = s.observer) || o.disconnect(), delete i.classes;
+                            } else if ("position" === e) {
+                                var a, u;
+                                null == (a = i.position) || null == (u = a.observer) || u.disconnect(), delete i.position;
+                            } else {
+                                var c, l, h;
+                                null == (c = i.attributes) || null == (l = c[e]) || null == (h = l.observer) || h.disconnect(), delete i.attributes[e];
+                            }
+                    })(t, e),
+                    r.setValue(t, n);
+            }
+        }
+        function Y(t, e) {
+            t.html && X(e, "html", t.html),
+                t.classes && X(e, "class", t.classes),
+                t.position && X(e, "position", t.position),
+                Object.keys(t.attributes).forEach(function (r) {
+                    X(e, r, t.attributes[r]);
+                });
+        }
+        function tt() {
+            O.forEach(Y);
+        }
+        function et(t) {
+            if ("position" !== t.kind || 1 !== t.elements.size) {
+                var e = new Set(t.elements);
+                document.querySelectorAll(t.selector).forEach(function (r) {
+                    e.has(r) ||
+                        (t.elements.add(r),
+                        (function (t, e) {
+                            var r = null;
+                            "html" === t.kind ? (r = D(e)) : "class" === t.kind ? (r = Z(e)) : "attribute" === t.kind ? (r = W(e, t.attribute)) : "position" === t.kind && (r = q(e)), r && (r.mutations.push(t), r.mutationRunner(r));
+                        })(t, r));
+                });
+            }
+        }
+        function rt() {
+            T.forEach(et);
+        }
+        function nt(t) {
+            return "undefined" == typeof document
+                ? R
+                : (T.add(t),
+                  et(t),
+                  {
+                      revert: function () {
+                          !(function (t) {
+                              t.elements.forEach(function (e) {
+                                  return (function (t, e) {
+                                      var r = null;
+                                      if (("html" === t.kind ? (r = D(e)) : "class" === t.kind ? (r = Z(e)) : "attribute" === t.kind ? (r = W(e, t.attribute)) : "position" === t.kind && (r = q(e)), r)) {
+                                          var n = r.mutations.indexOf(t);
+                                          -1 !== n && r.mutations.splice(n, 1), r.mutationRunner(r);
+                                      }
+                                  })(t, e);
+                              }),
+                                  t.elements.clear(),
+                                  T.delete(t);
+                          })(t);
+                      },
+                  });
+        }
+        function it(t, e) {
+            return nt({ kind: "html", elements: new Set(), mutate: e, selector: t });
+        }
+        function st(t, e) {
+            return nt({ kind: "position", elements: new Set(), mutate: e, selector: t });
+        }
+        function ot(t, e) {
+            return nt({ kind: "class", elements: new Set(), mutate: e, selector: t });
+        }
+        function at(t, e, r) {
+            return V.test(e)
+                ? "class" === e || "className" === e
+                    ? ot(t, function (t) {
+                          var e = r(Array.from(t).join(" "));
+                          t.clear(),
+                              e &&
+                                  e
+                                      .split(/\s+/g)
+                                      .filter(Boolean)
+                                      .forEach(function (e) {
+                                          return t.add(e);
+                                      });
+                      })
+                    : nt({ kind: "attribute", attribute: e, elements: new Set(), mutate: r, selector: t })
+                : R;
+        }
+        "undefined" != typeof document &&
+            (z ||
+                (z = new MutationObserver(function () {
+                    rt();
+                })),
+            rt(),
+            z.observe(document.documentElement, { childList: !0, subtree: !0, attributes: !1, characterData: !1 }));
+        const ut = function (t) {
+            var e = t.selector,
+                r = t.action,
+                n = t.value,
+                i = t.attribute,
+                s = t.parentSelector,
+                o = t.insertBeforeSelector;
+            if ("html" === i) {
+                if ("append" === r)
+                    return it(e, function (t) {
+                        return t + (null != n ? n : "");
+                    });
+                if ("set" === r)
+                    return it(e, function () {
+                        return null != n ? n : "";
+                    });
+            } else if ("class" === i) {
+                if ("append" === r)
+                    return ot(e, function (t) {
+                        n && t.add(n);
+                    });
+                if ("remove" === r)
+                    return ot(e, function (t) {
+                        n && t.delete(n);
+                    });
+                if ("set" === r)
+                    return ot(e, function (t) {
+                        t.clear(), n && t.add(n);
+                    });
+            } else if ("position" === i) {
+                if ("set" === r && s)
+                    return st(e, function () {
+                        return { insertBeforeSelector: o, parentSelector: s };
+                    });
+            } else {
+                if ("append" === r)
+                    return at(e, i, function (t) {
+                        return null !== t ? t + (null != n ? n : "") : null != n ? n : "";
+                    });
+                if ("set" === r)
+                    return at(e, i, function () {
+                        return null != n ? n : "";
+                    });
+                if ("remove" === r)
+                    return at(e, i, function () {
+                        return null;
+                    });
+            }
+            return R;
+        };
+        function ct(t) {
+            let e = 2166136261;
+            const r = t.length;
+            for (let n = 0; n < r; n++) (e ^= t.charCodeAt(n)), (e += (e << 1) + (e << 4) + (e << 7) + (e << 8) + (e << 24));
+            return e >>> 0;
+        }
+        function lt(t, e, r) {
+            return 2 === r ? (ct(ct(t + e) + "") % 1e4) / 1e4 : 1 === r ? (ct(e + t) % 1e3) / 1e3 : null;
+        }
+        function ht(t, e) {
+            return t >= e[0] && t < e[1];
+        }
+        function ft(t) {
+            try {
+                const e = t.replace(/([^\\])\//g, "$1\\/");
+                return new RegExp(e);
+            } catch (Tt) {
+                return void console.error(Tt);
+            }
+        }
+        function dt(t, e, r) {
+            try {
+                const n = new URL(t, "https://_");
+                if ("regex" === e) {
+                    const t = ft(r);
+                    return !!t && (t.test(n.href) || t.test(n.href.substring(n.origin.length)));
+                }
+                return (
+                    "simple" === e &&
+                    (function (t, e) {
+                        try {
+                            const r = new URL(e.replace(/^([^:/?]*)\./i, "https://$1.").replace(/\*/g, "_____"), "https://_____"),
+                                n = [
+                                    [t.host, r.host, !1],
+                                    [t.pathname, r.pathname, !0],
+                                ];
+                            return (
+                                r.hash && n.push([t.hash, r.hash, !1]),
+                                r.searchParams.forEach((e, r) => {
+                                    n.push([t.searchParams.get(r) || "", e, !1]);
+                                }),
+                                !n.some(
+                                    (t) =>
+                                        !(function (t, e, r) {
+                                            try {
+                                                let n = e.replace(/[*.+?^${}()|[\]\\]/g, "\\$&").replace(/_____/g, ".*");
+                                                return r && (n = "\\/?" + n.replace(/(^\/|\/$)/g, "") + "\\/?"), new RegExp("^" + n + "$", "i").test(t);
+                                            } catch (Tt) {
+                                                return !1;
+                                            }
+                                        })(t[0], t[1], t[2])
+                                )
+                            );
+                        } catch (Tt) {
+                            return !1;
+                        }
+                    })(n, r)
+                );
+            } catch (Tt) {
+                return !1;
+            }
+        }
+        const pt = (t) => Uint8Array.from(atob(t), (t) => t.charCodeAt(0));
+        async function yt(t, e, r) {
+            if (((e = e || ""), !(r = r || (globalThis.crypto && globalThis.crypto.subtle)))) throw new Error("No SubtleCrypto implementation found");
+            try {
+                const n = await r.importKey("raw", pt(e), { name: "AES-CBC", length: 128 }, !0, ["encrypt", "decrypt"]),
+                    [i, s] = t.split("."),
+                    o = await r.decrypt({ name: "AES-CBC", iv: pt(i) }, n, pt(s));
+                return new TextDecoder().decode(o);
+            } catch (Tt) {
+                throw new Error("Failed to decrypt");
+            }
+        }
+        function _t(t) {
+            return "string" == typeof t ? t : JSON.stringify(t);
+        }
+        function gt(t) {
+            "number" == typeof t && (t += ""), (t && "string" == typeof t) || (t = "0");
+            const e = t.replace(/(^v|\+.*$)/g, "").split(/[-.]/);
+            return 3 === e.length && e.push("~"), e.map((t) => (t.match(/^[0-9]+$/) ? t.padStart(5, " ") : t)).join("-");
+        }
+        const mt = {};
+        function vt(t, e) {
+            if ("$or" in e) return Et(t, e.$or);
+            if ("$nor" in e) return !Et(t, e.$nor);
+            if ("$and" in e)
+                return (function (t, e) {
+                    for (let r = 0; r < e.length; r++) if (!vt(t, e[r])) return !1;
+                    return !0;
+                })(t, e.$and);
+            if ("$not" in e) return !vt(t, e.$not);
+            for (const [r, n] of Object.entries(e)) if (!kt(n, bt(t, r))) return !1;
+            return !0;
+        }
+        function bt(t, e) {
+            const r = e.split(".");
+            let n = t;
+            for (let i = 0; i < r.length; i++) {
+                if (!n || "object" != typeof n || !(r[i] in n)) return null;
+                n = n[r[i]];
+            }
+            return n;
+        }
+        function kt(t, e) {
+            if ("string" == typeof t) return e + "" === t;
+            if ("number" == typeof t) return 1 * e === t;
+            if ("boolean" == typeof t) return !!e === t;
+            if (null === t) return null === e;
+            if (Array.isArray(t) || !xt(t)) return JSON.stringify(e) === JSON.stringify(t);
+            for (const r in t) if (!wt(r, e, t[r])) return !1;
+            return !0;
+        }
+        function xt(t) {
+            const e = Object.keys(t);
+            return e.length > 0 && e.filter((t) => "$" === t[0]).length === e.length;
+        }
+        function At(t, e) {
+            return Array.isArray(t) ? t.some((t) => e.includes(t)) : e.includes(t);
+        }
+        function wt(t, e, r) {
+            switch (t) {
+                case "$veq":
+                    return gt(e) === gt(r);
+                case "$vne":
+                    return gt(e) !== gt(r);
+                case "$vgt":
+                    return gt(e) > gt(r);
+                case "$vgte":
+                    return gt(e) >= gt(r);
+                case "$vlt":
+                    return gt(e) < gt(r);
+                case "$vlte":
+                    return gt(e) <= gt(r);
+                case "$eq":
+                    return e === r;
+                case "$ne":
+                    return e !== r;
+                case "$lt":
+                    return e < r;
+                case "$lte":
+                    return e <= r;
+                case "$gt":
+                    return e > r;
+                case "$gte":
+                    return e >= r;
+                case "$exists":
+                    return r ? null != e : null == e;
+                case "$in":
+                    return !!Array.isArray(r) && At(e, r);
+                case "$nin":
+                    return !!Array.isArray(r) && !At(e, r);
+                case "$not":
+                    return !kt(r, e);
+                case "$size":
+                    return !!Array.isArray(e) && kt(r, e.length);
+                case "$elemMatch":
+                    return (function (t, e) {
+                        if (!Array.isArray(t)) return !1;
+                        const r = xt(e) ? (t) => kt(e, t) : (t) => vt(t, e);
+                        for (let n = 0; n < t.length; n++) if (t[n] && r(t[n])) return !0;
+                        return !1;
+                    })(e, r);
+                case "$all":
+                    if (!Array.isArray(e)) return !1;
+                    for (let t = 0; t < r.length; t++) {
+                        let n = !1;
+                        for (let i = 0; i < e.length; i++)
+                            if (kt(r[t], e[i])) {
+                                n = !0;
+                                break;
+                            }
+                        if (!n) return !1;
+                    }
+                    return !0;
+                case "$regex":
+                    try {
+                        return ((n = r), mt[n] || (mt[n] = new RegExp(n.replace(/([^\\])\//g, "$1\\/"))), mt[n]).test(e);
+                    } catch (Tt) {
+                        return !1;
+                    }
+                case "$type":
+                    return (
+                        (function (t) {
+                            if (null === t) return "null";
+                            if (Array.isArray(t)) return "array";
+                            const e = typeof t;
+                            return ["string", "number", "boolean", "object", "undefined"].includes(e) ? e : "unknown";
+                        })(e) === r
+                    );
+                default:
+                    return console.error("Unknown operator: " + t), !1;
+            }
+            var n;
+        }
+        function Et(t, e) {
+            if (!e.length) return !0;
+            for (let r = 0; r < e.length; r++) if (vt(t, e[r])) return !0;
+            return !1;
+        }
+        const St = "undefined" != typeof window && "undefined" != typeof document,
+            Ft = (function () {
+                let t;
+                try {
+                    t = "0.34.0";
+                } catch (Tt) {
+                    t = "";
+                }
+                return t;
+            })();
+        class Bt {
+            constructor(t) {
+                if (
+                    ((t = t || {}),
+                    (this.version = Ft),
+                    (this._ctx = this.context = t),
+                    (this._renderer = null),
+                    (this._trackedExperiments = new Set()),
+                    (this._trackedFeatures = {}),
+                    (this.debug = !1),
+                    (this._subscriptions = new Set()),
+                    (this._rtQueue = []),
+                    (this._rtTimer = 0),
+                    (this.ready = !1),
+                    (this._assigned = new Map()),
+                    (this._forcedFeatureValues = new Map()),
+                    (this._attributeOverrides = {}),
+                    (this._activeAutoExperiments = new Map()),
+                    (this._triggeredExpKeys = new Set()),
+                    (this._loadFeaturesCalled = !1),
+                    t.remoteEval)
+                ) {
+                    if (t.decryptionKey) throw new Error("Encryption is not available for remoteEval");
+                    if (!t.clientKey) throw new Error("Missing clientKey");
+                    let e = !1;
+                    try {
+                        e = !!new URL(t.apiHost || "").hostname.match(/growthbook\.io$/i);
+                    } catch (Tt) {}
+                    if (e) throw new Error("Cannot use remoteEval on GrowthBook Cloud");
+                } else if (t.cacheKeyAttributes) throw new Error("cacheKeyAttributes are only used for remoteEval");
+                t.features && (this.ready = !0),
+                    St && t.enableDevMode && ((window._growthbook = this), document.dispatchEvent(new Event("gbloaded"))),
+                    t.experiments && ((this.ready = !0), this._updateAllAutoExperiments()),
+                    t.clientKey && !t.remoteEval && this._refresh({}, !0, !1);
+            }
+            async loadFeatures(t) {
+                t && t.autoRefresh && (this._ctx.subscribeToChanges = !0),
+                    (this._loadFeaturesCalled = !0),
+                    await this._refresh(t, !0, !0),
+                    this._canSubscribe() &&
+                        (function (t) {
+                            const e = y(t),
+                                r = s.get(e) || new Set();
+                            r.add(t), s.set(e, r);
+                        })(this);
+            }
+            async refreshFeatures(t) {
+                await this._refresh(t, !1, !0);
+            }
+            getApiInfo() {
+                return [this.getApiHosts().apiHost, this.getClientKey()];
+            }
+            getApiHosts() {
+                const t = this._ctx.apiHost || "https://cdn.growthbook.io";
+                return {
+                    apiHost: t.replace(/\/*$/, ""),
+                    streamingHost: (this._ctx.streamingHost || t).replace(/\/*$/, ""),
+                    apiRequestHeaders: this._ctx.apiHostRequestHeaders,
+                    streamingHostRequestHeaders: this._ctx.streamingHostRequestHeaders,
+                };
+            }
+            getClientKey() {
+                return this._ctx.clientKey || "";
+            }
+            isRemoteEval() {
+                return this._ctx.remoteEval || !1;
+            }
+            getCacheKeyAttributes() {
+                return this._ctx.cacheKeyAttributes;
+            }
+            async _refresh(t, e, r) {
+                if (((t = t || {}), !this._ctx.clientKey)) throw new Error("Missing clientKey");
+                await f(this, t.timeout, t.skipCache || this._ctx.enableDevMode, e, r, !1 !== this._ctx.backgroundSync);
+            }
+            _render() {
+                this._renderer && this._renderer();
+            }
+            setFeatures(t) {
+                (this._ctx.features = t), (this.ready = !0), this._render();
+            }
+            async setEncryptedFeatures(t, e, r) {
+                const n = await yt(t, e || this._ctx.decryptionKey, r);
+                this.setFeatures(JSON.parse(n));
+            }
+            setExperiments(t) {
+                (this._ctx.experiments = t), (this.ready = !0), this._updateAllAutoExperiments();
+            }
+            async setEncryptedExperiments(t, e, r) {
+                const n = await yt(t, e || this._ctx.decryptionKey, r);
+                this.setExperiments(JSON.parse(n));
+            }
+            async decryptPayload(t, e, r) {
+                return (
+                    t.encryptedFeatures && ((t.features = JSON.parse(await yt(t.encryptedFeatures, e || this._ctx.decryptionKey, r))), delete t.encryptedFeatures),
+                    t.encryptedExperiments && ((t.experiments = JSON.parse(await yt(t.encryptedExperiments, e || this._ctx.decryptionKey, r))), delete t.encryptedExperiments),
+                    t
+                );
+            }
+            async setAttributes(t) {
+                (this._ctx.attributes = t), this._ctx.stickyBucketService && (await this.refreshStickyBuckets()), this._ctx.remoteEval ? await this._refreshForRemoteEval() : (this._render(), this._updateAllAutoExperiments());
+            }
+            async setAttributeOverrides(t) {
+                (this._attributeOverrides = t), this._ctx.stickyBucketService && (await this.refreshStickyBuckets()), this._ctx.remoteEval ? await this._refreshForRemoteEval() : (this._render(), this._updateAllAutoExperiments());
+            }
+            async setForcedVariations(t) {
+                (this._ctx.forcedVariations = t || {}), this._ctx.remoteEval ? await this._refreshForRemoteEval() : (this._render(), this._updateAllAutoExperiments());
+            }
+            setForcedFeatures(t) {
+                (this._forcedFeatureValues = t), this._render();
+            }
+            async setURL(t) {
+                if (((this._ctx.url = t), this._ctx.remoteEval)) return await this._refreshForRemoteEval(), void this._updateAllAutoExperiments(!0);
+                this._updateAllAutoExperiments(!0);
+            }
+            getAttributes() {
+                return { ...this._ctx.attributes, ...this._attributeOverrides };
+            }
+            getForcedVariations() {
+                return this._ctx.forcedVariations || {};
+            }
+            getForcedFeatures() {
+                return this._forcedFeatureValues || new Map();
+            }
+            getStickyBucketAssignmentDocs() {
+                return this._ctx.stickyBucketAssignmentDocs || {};
+            }
+            getUrl() {
+                return this._ctx.url || "";
+            }
+            getFeatures() {
+                return this._ctx.features || {};
+            }
+            getExperiments() {
+                return this._ctx.experiments || [];
+            }
+            subscribe(t) {
+                return (
+                    this._subscriptions.add(t),
+                    () => {
+                        this._subscriptions.delete(t);
+                    }
+                );
+            }
+            _canSubscribe() {
+                return !1 !== this._ctx.backgroundSync && this._ctx.subscribeToChanges;
+            }
+            async _refreshForRemoteEval() {
+                this._ctx.remoteEval && this._loadFeaturesCalled && (await this._refresh({}, !1, !0).catch(() => {}));
+            }
+            getAllResults() {
+                return new Map(this._assigned);
+            }
+            destroy() {
+                var t;
+                this._subscriptions.clear(),
+                    this._assigned.clear(),
+                    this._trackedExperiments.clear(),
+                    (this._trackedFeatures = {}),
+                    (this._rtQueue = []),
+                    this._rtTimer && clearTimeout(this._rtTimer),
+                    (t = this),
+                    s.forEach((e) => e.delete(t)),
+                    St && window._growthbook === this && delete window._growthbook,
+                    this._activeAutoExperiments.forEach((t) => {
+                        t.undo();
+                    }),
+                    this._activeAutoExperiments.clear(),
+                    this._triggeredExpKeys.clear();
+            }
+            setRenderer(t) {
+                this._renderer = t;
+            }
+            forceVariation(t, e) {
+                (this._ctx.forcedVariations = this._ctx.forcedVariations || {}), (this._ctx.forcedVariations[t] = e), this._ctx.remoteEval ? this._refreshForRemoteEval() : (this._updateAllAutoExperiments(), this._render());
+            }
+            run(t) {
+                const e = this._run(t, null);
+                return this._fireSubscriptions(t, e), e;
+            }
+            triggerExperiment(t) {
+                return (
+                    this._triggeredExpKeys.add(t),
+                    this._ctx.experiments
+                        ? this._ctx.experiments
+                              .filter((e) => e.key === t)
+                              .map((t) => (t.manual ? this._runAutoExperiment(t) : null))
+                              .filter((t) => null !== t)
+                        : null
+                );
+            }
+            _runAutoExperiment(t, e) {
+                const r = this._activeAutoExperiments.get(t);
+                if (t.manual && !this._triggeredExpKeys.has(t.key) && !r) return null;
+                const n = this.run(t),
+                    i = JSON.stringify(n.value);
+                if (!e && n.inExperiment && r && r.valueHash === i) return n;
+                if ((r && this._undoActiveAutoExperiment(t), n.inExperiment)) {
+                    const e = this._applyDOMChanges(n.value);
+                    e && this._activeAutoExperiments.set(t, { undo: e, valueHash: i });
+                }
+                return n;
+            }
+            _undoActiveAutoExperiment(t) {
+                const e = this._activeAutoExperiments.get(t);
+                e && (e.undo(), this._activeAutoExperiments.delete(t));
+            }
+            _updateAllAutoExperiments(t) {
+                const e = this._ctx.experiments || [],
+                    r = new Set(e);
+                this._activeAutoExperiments.forEach((t, e) => {
+                    r.has(e) || (t.undo(), this._activeAutoExperiments.delete(e));
+                }),
+                    e.forEach((e) => {
+                        this._runAutoExperiment(e, t);
+                    });
+            }
+            _fireSubscriptions(t, e) {
+                const r = t.key,
+                    n = this._assigned.get(r);
+                (n && n.result.inExperiment === e.inExperiment && n.result.variationId === e.variationId) ||
+                    (this._assigned.set(r, { experiment: t, result: e }),
+                    this._subscriptions.forEach((r) => {
+                        try {
+                            r(t, e);
+                        } catch (Tt) {
+                            console.error(Tt);
+                        }
+                    }));
+            }
+            _trackFeatureUsage(t, e) {
+                if ("override" === e.source) return;
+                const r = JSON.stringify(e.value);
+                if (this._trackedFeatures[t] !== r) {
+                    if (((this._trackedFeatures[t] = r), this._ctx.onFeatureUsage))
+                        try {
+                            this._ctx.onFeatureUsage(t, e);
+                        } catch (Tt) {}
+                    St &&
+                        window.fetch &&
+                        (this._rtQueue.push({ key: t, on: e.on }),
+                        this._rtTimer ||
+                            (this._rtTimer = window.setTimeout(() => {
+                                this._rtTimer = 0;
+                                const t = [...this._rtQueue];
+                                (this._rtQueue = []),
+                                    this._ctx.realtimeKey &&
+                                        window.fetch("https://rt.growthbook.io/?key=".concat(this._ctx.realtimeKey, "&events=").concat(encodeURIComponent(JSON.stringify(t))), { cache: "no-cache", mode: "no-cors" }).catch(() => {});
+                            }, this._ctx.realtimeInterval || 2e3)));
+                }
+            }
+            _getFeatureResult(t, e, r, n, i, s) {
+                const o = { value: e, on: !!e, off: !e, source: r, ruleId: n || "" };
+                return i && (o.experiment = i), s && (o.experimentResult = s), this._trackFeatureUsage(t, o), o;
+            }
+            isOn(t) {
+                return this.evalFeature(t).on;
+            }
+            isOff(t) {
+                return this.evalFeature(t).off;
+            }
+            getFeatureValue(t, e) {
+                const r = this.evalFeature(t).value;
+                return null === r ? e : r;
+            }
+            feature(t) {
+                return this.evalFeature(t);
+            }
+            evalFeature(t) {
+                return this._evalFeature(t);
+            }
+            _evalFeature(t, e) {
+                if ((e = e || { evaluatedFeatures: new Set() }).evaluatedFeatures.has(t)) return this._getFeatureResult(t, null, "cyclicPrerequisite");
+                if ((e.evaluatedFeatures.add(t), (e.id = t), this._forcedFeatureValues.has(t))) return this._getFeatureResult(t, this._forcedFeatureValues.get(t), "override");
+                if (!this._ctx.features || !this._ctx.features[t]) return this._getFeatureResult(t, null, "unknownFeature");
+                const r = this._ctx.features[t];
+                if (r.rules)
+                    t: for (const n of r.rules) {
+                        if (n.parentConditions)
+                            for (const s of n.parentConditions) {
+                                const r = this._evalFeature(s.id, e);
+                                if ("cyclicPrerequisite" === r.source) return this._getFeatureResult(t, null, "cyclicPrerequisite");
+                                if (!vt({ value: r.value }, s.condition || {})) {
+                                    if (s.gate) return this._getFeatureResult(t, null, "prerequisite");
+                                    continue t;
+                                }
+                            }
+                        if (n.filters && this._isFilteredOut(n.filters)) continue;
+                        if ("force" in n) {
+                            if (n.condition && !this._conditionPasses(n.condition)) continue;
+                            if (!this._isIncludedInRollout(n.seed || t, n.hashAttribute, this._ctx.stickyBucketService && !n.disableStickyBucketing ? n.fallbackAttribute : void 0, n.range, n.coverage, n.hashVersion)) continue;
+                            return (
+                                n.tracks &&
+                                    n.tracks.forEach((t) => {
+                                        this._track(t.experiment, t.result);
+                                    }),
+                                this._getFeatureResult(t, n.force, "force", n.id)
+                            );
+                        }
+                        if (!n.variations) continue;
+                        const r = { variations: n.variations, key: n.key || t };
+                        "coverage" in n && (r.coverage = n.coverage),
+                            n.weights && (r.weights = n.weights),
+                            n.hashAttribute && (r.hashAttribute = n.hashAttribute),
+                            n.fallbackAttribute && (r.fallbackAttribute = n.fallbackAttribute),
+                            n.disableStickyBucketing && (r.disableStickyBucketing = n.disableStickyBucketing),
+                            void 0 !== n.bucketVersion && (r.bucketVersion = n.bucketVersion),
+                            void 0 !== n.minBucketVersion && (r.minBucketVersion = n.minBucketVersion),
+                            n.namespace && (r.namespace = n.namespace),
+                            n.meta && (r.meta = n.meta),
+                            n.ranges && (r.ranges = n.ranges),
+                            n.name && (r.name = n.name),
+                            n.phase && (r.phase = n.phase),
+                            n.seed && (r.seed = n.seed),
+                            n.hashVersion && (r.hashVersion = n.hashVersion),
+                            n.filters && (r.filters = n.filters),
+                            n.condition && (r.condition = n.condition);
+                        const i = this._run(r, t);
+                        if ((this._fireSubscriptions(r, i), i.inExperiment && !i.passthrough)) return this._getFeatureResult(t, i.value, "experiment", n.id, r, i);
+                    }
+                return this._getFeatureResult(t, void 0 === r.defaultValue ? null : r.defaultValue, "defaultValue");
+            }
+            _isIncludedInRollout(t, e, r, n, i, s) {
+                if (!n && void 0 === i) return !0;
+                const { hashValue: o } = this._getHashAttribute(e, r);
+                if (!o) return !1;
+                const a = lt(t, o, s || 1);
+                return null !== a && (n ? ht(a, n) : void 0 === i || a <= i);
+            }
+            _conditionPasses(t) {
+                return vt(this.getAttributes(), t);
+            }
+            _isFilteredOut(t) {
+                return t.some((t) => {
+                    const { hashValue: e } = this._getHashAttribute(t.attribute);
+                    if (!e) return !0;
+                    const r = lt(t.seed, e, t.hashVersion || 2);
+                    return null === r || !t.ranges.some((t) => ht(r, t));
+                });
+            }
+            _run(t, e) {
+                const r = t.key,
+                    n = t.variations.length;
+                if (n < 2) return this._getResult(t, -1, !1, e);
+                if (!1 === this._ctx.enabled) return this._getResult(t, -1, !1, e);
+                if (
+                    (t = this._mergeOverrides(t)).urlPatterns &&
+                    !(function (t, e) {
+                        if (!e.length) return !1;
+                        let r = !1,
+                            n = !1;
+                        for (let i = 0; i < e.length; i++) {
+                            const s = dt(t, e[i].type, e[i].pattern);
+                            if (!1 === e[i].include) {
+                                if (s) return !1;
+                            } else (r = !0), s && (n = !0);
+                        }
+                        return n || !r;
+                    })(this._getContextUrl(), t.urlPatterns)
+                )
+                    return this._getResult(t, -1, !1, e);
+                const i = (function (t, e, r) {
+                    if (!e) return null;
+                    const n = e.split("?")[1];
+                    if (!n) return null;
+                    const i = n
+                        .replace(/#.*/, "")
+                        .split("&")
+                        .map((t) => t.split("=", 2))
+                        .filter((e) => {
+                            let [r] = e;
+                            return r === t;
+                        })
+                        .map((t) => {
+                            let [, e] = t;
+                            return parseInt(e);
+                        });
+                    return i.length > 0 && i[0] >= 0 && i[0] < r ? i[0] : null;
+                })(r, this._getContextUrl(), n);
+                if (null !== i) return this._getResult(t, i, !1, e);
+                if (this._ctx.forcedVariations && r in this._ctx.forcedVariations) {
+                    const n = this._ctx.forcedVariations[r];
+                    return this._getResult(t, n, !1, e);
+                }
+                if ("draft" === t.status || !1 === t.active) return this._getResult(t, -1, !1, e);
+                const { hashAttribute: s, hashValue: o } = this._getHashAttribute(t.hashAttribute, this._ctx.stickyBucketService && !t.disableStickyBucketing ? t.fallbackAttribute : void 0);
+                if (!o) return this._getResult(t, -1, !1, e);
+                let a = -1,
+                    u = !1,
+                    c = !1;
+                if (this._ctx.stickyBucketService && !t.disableStickyBucketing) {
+                    const { variation: e, versionIsBlocked: r } = this._getStickyBucketVariation(t.key, t.bucketVersion, t.minBucketVersion, t.meta);
+                    (u = e >= 0), (a = e), (c = !!r);
+                }
+                if (!u) {
+                    if (t.filters) {
+                        if (this._isFilteredOut(t.filters)) return this._getResult(t, -1, !1, e);
+                    } else if (
+                        t.namespace &&
+                        !(function (t, e) {
+                            const r = lt("__" + e[0], t, 1);
+                            return null !== r && r >= e[1] && r < e[2];
+                        })(o, t.namespace)
+                    )
+                        return this._getResult(t, -1, !1, e);
+                    if (
+                        t.include &&
+                        !(function (t) {
+                            try {
+                                return t();
+                            } catch (Tt) {
+                                return console.error(Tt), !1;
+                            }
+                        })(t.include)
+                    )
+                        return this._getResult(t, -1, !1, e);
+                    if (t.condition && !this._conditionPasses(t.condition)) return this._getResult(t, -1, !1, e);
+                    if (t.parentConditions)
+                        for (const r of t.parentConditions) {
+                            const n = this._evalFeature(r.id);
+                            if ("cyclicPrerequisite" === n.source) return this._getResult(t, -1, !1, e);
+                            if (!vt({ value: n.value }, r.condition || {})) return this._getResult(t, -1, !1, e);
+                        }
+                    if (t.groups && !this._hasGroupOverlap(t.groups)) return this._getResult(t, -1, !1, e);
+                }
+                if (t.url && !this._urlIsValid(t.url)) return this._getResult(t, -1, !1, e);
+                const l = lt(t.seed || r, o, t.hashVersion || 1);
+                if (null === l) return this._getResult(t, -1, !1, e);
+                if (
+                    (u ||
+                        (a = (function (t, e) {
+                            for (let r = 0; r < e.length; r++) if (ht(t, e[r])) return r;
+                            return -1;
+                        })(
+                            l,
+                            t.ranges ||
+                                (function (t, e, r) {
+                                    (e = void 0 === e ? 1 : e) < 0 ? (e = 0) : e > 1 && (e = 1);
+                                    const n = (i = t) <= 0 ? [] : new Array(i).fill(1 / i);
+                                    var i;
+                                    (r = r || n).length !== t && (r = n);
+                                    const s = r.reduce((t, e) => e + t, 0);
+                                    (s < 0.99 || s > 1.01) && (r = n);
+                                    let o = 0;
+                                    return r.map((t) => {
+                                        const r = o;
+                                        return (o += t), [r, r + e * t];
+                                    });
+                                })(n, void 0 === t.coverage ? 1 : t.coverage, t.weights)
+                        )),
+                    c)
+                )
+                    return this._getResult(t, -1, !1, e, void 0, !0);
+                if (a < 0) return this._getResult(t, -1, !1, e);
+                if ("force" in t) return this._getResult(t, void 0 === t.force ? -1 : t.force, !1, e);
+                if (this._ctx.qaMode) return this._getResult(t, -1, !1, e);
+                if ("stopped" === t.status) return this._getResult(t, -1, !1, e);
+                const h = this._getResult(t, a, !0, e, l, u);
+                if (this._ctx.stickyBucketService && !t.disableStickyBucketing) {
+                    const { changed: e, key: r, doc: n } = this._generateStickyBucketAssignmentDoc(s, _t(o), { [this._getStickyBucketExperimentKey(t.key, t.bucketVersion)]: h.key });
+                    e && ((this._ctx.stickyBucketAssignmentDocs = this._ctx.stickyBucketAssignmentDocs || {}), (this._ctx.stickyBucketAssignmentDocs[r] = n), this._ctx.stickyBucketService.saveAssignments(n));
+                }
+                return this._track(t, h), h;
+            }
+            log(t, e) {
+                this.debug && (this._ctx.log ? this._ctx.log(t, e) : console.log(t, e));
+            }
+            _track(t, e) {
+                if (!this._ctx.trackingCallback) return;
+                const r = t.key,
+                    n = e.hashAttribute + e.hashValue + r + e.variationId;
+                if (!this._trackedExperiments.has(n)) {
+                    this._trackedExperiments.add(n);
+                    try {
+                        this._ctx.trackingCallback(t, e);
+                    } catch (Tt) {
+                        console.error(Tt);
+                    }
+                }
+            }
+            _mergeOverrides(t) {
+                const e = t.key,
+                    r = this._ctx.overrides;
+                return r && r[e] && "string" == typeof (t = Object.assign({}, t, r[e])).url && (t.url = ft(t.url)), t;
+            }
+            _getHashAttribute(t, e) {
+                let r = t || "id",
+                    n = "";
+                return (
+                    this._attributeOverrides[r] ? (n = this._attributeOverrides[r]) : this._ctx.attributes ? (n = this._ctx.attributes[r] || "") : this._ctx.user && (n = this._ctx.user[r] || ""),
+                    !n && e && (this._attributeOverrides[e] ? (n = this._attributeOverrides[e]) : this._ctx.attributes ? (n = this._ctx.attributes[e] || "") : this._ctx.user && (n = this._ctx.user[e] || ""), n && (r = e)),
+                    { hashAttribute: r, hashValue: n }
+                );
+            }
+            _getResult(t, e, r, n, i, s) {
+                let o = !0;
+                (e < 0 || e >= t.variations.length) && ((e = 0), (o = !1));
+                const { hashAttribute: a, hashValue: u } = this._getHashAttribute(t.hashAttribute, this._ctx.stickyBucketService && !t.disableStickyBucketing ? t.fallbackAttribute : void 0),
+                    c = t.meta ? t.meta[e] : {},
+                    l = { key: c.key || "" + e, featureId: n, inExperiment: o, hashUsed: r, variationId: e, value: t.variations[e], hashAttribute: a, hashValue: u, stickyBucketUsed: !!s };
+                return c.name && (l.name = c.name), void 0 !== i && (l.bucket = i), c.passthrough && (l.passthrough = c.passthrough), l;
+            }
+            _getContextUrl() {
+                return this._ctx.url || (St ? window.location.href : "");
+            }
+            _urlIsValid(t) {
+                const e = this._getContextUrl();
+                if (!e) return !1;
+                const r = e.replace(/^https?:\/\//, "").replace(/^[^/]*\//, "/");
+                return !!t.test(e) || !!t.test(r);
+            }
+            _hasGroupOverlap(t) {
+                const e = this._ctx.groups || {};
+                for (let r = 0; r < t.length; r++) if (e[t[r]]) return !0;
+                return !1;
+            }
+            _applyDOMChanges(t) {
+                if (!St) return;
+                const e = [];
+                if (t.css) {
+                    const r = document.createElement("style");
+                    (r.innerHTML = t.css), document.head.appendChild(r), e.push(() => r.remove());
+                }
+                if (t.js) {
+                    const r = document.createElement("script");
+                    (r.innerHTML = t.js), document.head.appendChild(r), e.push(() => r.remove());
+                }
+                return (
+                    t.domMutations &&
+                        t.domMutations.forEach((t) => {
+                            e.push(ut(t).revert);
+                        }),
+                    () => {
+                        e.forEach((t) => t());
+                    }
+                );
+            }
+            _deriveStickyBucketIdentifierAttributes(t) {
+                const e = new Set(),
+                    r = t && t.features ? t.features : this.getFeatures(),
+                    n = t && t.experiments ? t.experiments : this.getExperiments();
+                return (
+                    Object.keys(r).forEach((t) => {
+                        const n = r[t];
+                        if (n.rules) for (const r of n.rules) r.variations && (e.add(r.hashAttribute || "id"), r.fallbackAttribute && e.add(r.fallbackAttribute));
+                    }),
+                    n.map((t) => {
+                        e.add(t.hashAttribute || "id"), t.fallbackAttribute && e.add(t.fallbackAttribute);
+                    }),
+                    Array.from(e)
+                );
+            }
+            async refreshStickyBuckets(t) {
+                if (this._ctx.stickyBucketService) {
+                    const e = this._getStickyBucketAttributes(t);
+                    this._ctx.stickyBucketAssignmentDocs = await this._ctx.stickyBucketService.getAllAssignments(e);
+                }
+            }
+            _getStickyBucketAssignments() {
+                const t = {};
+                return (
+                    Object.values(this._ctx.stickyBucketAssignmentDocs || {}).forEach((e) => {
+                        e.assignments && Object.assign(t, e.assignments);
+                    }),
+                    t
+                );
+            }
+            _getStickyBucketVariation(t, e, r, n) {
+                (e = e || 0), (r = r || 0), (n = n || []);
+                const i = this._getStickyBucketExperimentKey(t, e),
+                    s = this._getStickyBucketAssignments();
+                if (r > 0) for (let u = 0; u <= r; u++) if (void 0 !== s[this._getStickyBucketExperimentKey(t, u)]) return { variation: -1, versionIsBlocked: !0 };
+                const o = s[i];
+                if (void 0 === o) return { variation: -1 };
+                const a = n.findIndex((t) => t.key === o);
+                return a < 0 ? { variation: -1 } : { variation: a };
+            }
+            _getStickyBucketExperimentKey(t, e) {
+                return (e = e || 0), "".concat(t, "__").concat(e);
+            }
+            _getStickyBucketAttributes(t) {
+                const e = {};
+                return (
+                    (this._ctx.stickyBucketIdentifierAttributes = this._ctx.stickyBucketIdentifierAttributes ? this._ctx.stickyBucketIdentifierAttributes : this._deriveStickyBucketIdentifierAttributes(t)),
+                    this._ctx.stickyBucketIdentifierAttributes.forEach((t) => {
+                        const { hashValue: r } = this._getHashAttribute(t);
+                        e[t] = _t(r);
+                    }),
+                    e
+                );
+            }
+            _generateStickyBucketAssignmentDoc(t, e, r) {
+                const n = "".concat(t, "||").concat(e),
+                    i = (this._ctx.stickyBucketAssignmentDocs && this._ctx.stickyBucketAssignmentDocs[n] && this._ctx.stickyBucketAssignmentDocs[n].assignments) || {},
+                    s = { ...i, ...r };
+                return { key: n, doc: { attributeName: t, attributeValue: e, assignments: s }, changed: JSON.stringify(i) !== JSON.stringify(s) };
+            }
+        }
+        var Vt,
+            Rt = (function (t) {
+                function e(e) {
+                    var r,
+                        n = t.call(this, e) || this;
+                    return (n._userAttributes = {}), (n._client = new Bt(e)), (n._userAttributes = null !== (r = n._client.getAttributes()) && void 0 !== r ? r : {}), n;
+                }
+                return (
+                    (function (t, e) {
+                        if ("function" != typeof e && null !== e) throw new TypeError("Class extends value " + String(e) + " is not a constructor or null");
+                        function r() {
+                            this.constructor = t;
+                        }
+                        E(t, e), (t.prototype = null === e ? Object.create(e) : ((r.prototype = e.prototype), new r()));
+                    })(e, t),
+                    (e.prototype.getFeatureValue = function (t, e) {
+                        return this._client.getFeatureValue(t, e);
+                    }),
+                    (e.prototype.isOn = function (t) {
+                        return this._client.isOn(t);
+                    }),
+                    (e.prototype.isInExperiment = function (t) {
+                        var e,
+                            r = this._client.evalFeature(t);
+                        return "force" === (null == r ? void 0 : r.source) || Boolean(null === (e = null == r ? void 0 : r.experimentResult) || void 0 === e ? void 0 : e.inExperiment);
+                    }),
+                    (e.prototype.loadFeatures = function (t) {
+                        return F(this, void 0, Promise, function () {
+                            return B(this, function (e) {
+                                switch (e.label) {
+                                    case 0:
+                                        return [4, this._client.loadFeatures(t)];
+                                    case 1:
+                                        return e.sent(), [2];
+                                }
+                            });
+                        });
+                    }),
+                    (e.prototype.setAttributes = function (t) {
+                        return F(this, void 0, Promise, function () {
+                            return B(this, function (e) {
+                                switch (e.label) {
+                                    case 0:
+                                        return (this._userAttributes = S(S({}, this._userAttributes), t)), [4, this._client.setAttributes(this._userAttributes)];
+                                    case 1:
+                                        return e.sent(), [2];
+                                }
+                            });
+                        });
+                    }),
+                    (e.prototype.setAttribute = function (t, e) {
+                        return F(this, void 0, Promise, function () {
+                            return B(this, function (r) {
+                                switch (r.label) {
+                                    case 0:
+                                        return (this._userAttributes[t] = e), [4, this._client.setAttributes(this._userAttributes)];
+                                    case 1:
+                                        return r.sent(), [2];
+                                }
+                            });
+                        });
+                    }),
+                    (e.prototype.getVariation = function (t) {
+                        var e,
+                            r,
+                            n = this._client.evalFeature(t);
+                        return null !== (r = null === (e = null == n ? void 0 : n.experimentResult) || void 0 === e ? void 0 : e.variationId) && void 0 !== r ? r : null;
+                    }),
+                    (e.prototype.evalFeature = function (t) {
+                        return this._client.evalFeature(t);
+                    }),
+                    (e.prototype.forceVariation = function (t, e) {
+                        this._client.forceVariation(t, e);
+                    }),
+                    (e.prototype.getAttributes = function () {
+                        return this._client.getAttributes();
+                    }),
+                    (e.prototype.destroy = function () {
+                        this._client.destroy();
+                    }),
+                    e
+                );
+            })(function (t) {
+                this._options = t;
+            });
+        !(function (t) {
+            t[(t.growthBook = 0)] = "growthBook";
+        })(Vt || (Vt = {}));
+        var Ot = (function () {
+            function t() {}
+            return (
+                (t.createFeatureProvider = function (t, e) {
+                    if (t === Vt.growthBook) return new Rt(e);
+                    throw new Error("Specified feature provider is unavailable");
+                }),
+                t
+            );
+        })();
+        return e;
+    })()
+);
