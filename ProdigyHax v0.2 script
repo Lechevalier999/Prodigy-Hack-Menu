@@ -42,7 +42,7 @@ style.textContent = `
     top: 50px;
     left: 50%;
     transform: translateX(-50%);
-    width: 240px;
+    width: 100%;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
