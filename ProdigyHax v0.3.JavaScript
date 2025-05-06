@@ -1,4 +1,4 @@
-alert("Welcome to ProdigyHax v0.2");
+alert("Welcome to ProdigyHax v0.3");
 
 let toggleKey = prompt("Enter a single key to use for opening the dropdown (e.g., 'm'):");
 
@@ -93,7 +93,7 @@ dropdown.className = "dropdown";
 
 const button = document.createElement("button");
 button.className = "dropbtn";
-button.textContent = `Prodigy Hax v0.2 (press "${toggleKey}")`;
+button.textContent = `Prodigy Hax v0.3 (press "${toggleKey}")`;
 
 const content = document.createElement("div");
 content.className = "dropdown-content";
