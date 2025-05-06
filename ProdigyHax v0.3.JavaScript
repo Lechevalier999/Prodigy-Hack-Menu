@@ -274,15 +274,7 @@ function toggleDropdown() {
     setTimeout(() => {
       content.classList.add("visible");
     }, 0);
-    playaudio();
   }
-}
-const audio = new Audio("https://raw.githubusercontent.com/Lechevalier999/Prodigy-Hack-Menu/main/videoplayback"); // Replace with your actual raw file URL
-
-function playAudio() {
-  audio.play().catch((error) => {
-    console.error("Error playing audio:", error);
-  });
 }
 
 button.addEventListener("click", (e) => {
