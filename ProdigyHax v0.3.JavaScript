@@ -250,19 +250,7 @@ function retrieveSavedData() {
   console.log(`Retrieved data for ${itemCategory}:`, savedData);
   alert(`The saved data for ${itemCategory} has been logged to the console.`);
 }
-
-// Call the function to unlock items
-unlockSpecificItem();
-
-// Optionally, you can call the retrieveSavedData function to view saved data
-// Uncomment the following line to test the retrieval functionality:
-// retrieveSavedData();
-      break;
-    default:
-      console.log("Unknown option selected");
-      break;
-  }
-}
+ break;
 
 function toggleDropdown() {
   if (content.style.display === "block") {
