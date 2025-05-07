@@ -135,7 +135,11 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
     case "Give Item":
       console.log("Give Item was clicked!");
       alert("You selected 'Give Item'!");
-// Function to unlock specific items
+      unlockSpecificItem();
+      break;
+  }
+}
+
 function unlockSpecificItem() {
   // Prompt the user for the item category
   const itemCategory = prompt(
