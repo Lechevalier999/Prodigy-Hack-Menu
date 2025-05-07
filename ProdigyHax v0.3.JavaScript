@@ -203,7 +203,7 @@ function unlockSpecificItem() {
   const processedItems = processItemData(chosenCategoryData, quantity);
 
   // Update the user's backpack
-  userBackpack[itemCategory] = processedItems;
+  boot.prototype.game._state._current.user.source.backpack[itemCategory] = processedItems;
 
   alert(
     `Successfully unlocked ${quantity} of each item in the ${itemCategory} category!`
