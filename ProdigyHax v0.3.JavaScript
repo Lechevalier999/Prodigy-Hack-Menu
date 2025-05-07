@@ -178,7 +178,7 @@ function unlockSpecificItem() {
 
   // Access game data
   const gameData = Boot.prototype.game._state._states.get("Boot")._gameData;
-  const userBackpack = Boot.prototype.game._state._current.user.source.data.backpack;
+  const userBackpack = Boot.prototype.game._state._current.user.source.backpack;
 
   // Helper function to process items
   function processItemData(data, quantity) {
