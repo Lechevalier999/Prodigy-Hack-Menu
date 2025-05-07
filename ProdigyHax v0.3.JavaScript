@@ -105,7 +105,6 @@ options.forEach(option => {
   link.href = "#";
   link.textContent = option;
 
-  // Add an event listener to execute code for each option
   link.addEventListener('click', function(event) {
     event.preventDefault(); // Prevent default action (e.g., page reload)
     handleOptionClick(option); // Call function for the selected option
@@ -114,7 +113,6 @@ options.forEach(option => {
   content.appendChild(link);
 });
 
-// Append the button and content to the dropdown
 dropdown.appendChild(button);
 dropdown.appendChild(content);
 document.body.appendChild(dropdown);
