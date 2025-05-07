@@ -250,7 +250,8 @@ function retrieveSavedData() {
   console.log(`Retrieved data for ${itemCategory}:`, savedData);
   alert(`The saved data for ${itemCategory} has been logged to the console.`);
 }
- break;
+
+break;
 
 function toggleDropdown() {
   if (content.style.display === "block") {
