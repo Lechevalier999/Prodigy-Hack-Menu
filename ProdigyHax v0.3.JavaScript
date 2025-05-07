@@ -180,11 +180,9 @@ function unlockSpecificItem() {
     return;
   }
 
-  // Access game data
   const gameData = Boot.prototype.game._state._states.get("Boot")._gameData;
-  const userBackpack = Boot.prototype.game._state._current.user.source.backpack;
+  const userBackpack = Boot.prototype.game._state._current.user.source.data.backpack;
 
-  // Helper function to process items
   function processItemData(data, quantity) {
     const items = [];
     data.forEach((item) => {
@@ -193,7 +191,6 @@ function unlockSpecificItem() {
     return items;
   }
 
-  // Process the chosen category
   const chosenCategoryData = gameData[itemCategory];
   if (!chosenCategoryData) {
     alert("No data found for the chosen category.");
@@ -202,8 +199,7 @@ function unlockSpecificItem() {
 
   const processedItems = processItemData(chosenCategoryData, quantity);
 
-  // Update the user's backpack
-  boot.prototype.game._state._current.user.source.backpack[itemCategory] = processedItems;
+  userbackpack[itemCategory] = processedItems;
 
   alert(
     `Successfully unlocked ${quantity} of each item in the ${itemCategory} category!`
