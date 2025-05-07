@@ -224,9 +224,10 @@ if (!validCategories.includes(selectedCategory)) {
     } else {
         unlockCategoryItems(selectedCategory, quantity);
         alert(`Successfully unlocked ${quantity} of '${selectedCategory}'!`);
-        break;
-    }
+  }
 }
+break;
+
 function toggleDropdown() {
   if (content.style.display === "block") {
     content.style.display = "none";
