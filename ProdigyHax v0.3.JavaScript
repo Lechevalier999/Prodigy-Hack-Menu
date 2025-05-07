@@ -255,4 +255,4 @@ window.addEventListener("click", (event) => {
     content.style.display = "none";
     content.classList.remove("visible");
 }
-});
+});}}
