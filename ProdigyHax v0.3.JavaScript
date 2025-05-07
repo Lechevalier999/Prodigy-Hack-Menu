@@ -135,7 +135,6 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
     case "Give Item":
       console.log("Give Item was clicked!");
       alert("You selected 'Give Item'!");
-
 function unlockCategoryItems(_0x3cdd19, _0x3233ac) {
     var _0x2dbfcd = function () {
         var _0xc4ed62 = true;
@@ -195,7 +194,6 @@ function unlockCategoryItems(_0x3cdd19, _0x3233ac) {
     _0x20c922.data[_0x3cdd19] = JSON.parse(all_items);
 }
 
-// Ask for the category and quantity
 var validCategories = [
     "weapon",
     "outfit",
@@ -224,9 +222,9 @@ if (!validCategories.includes(selectedCategory)) {
     } else {
         unlockCategoryItems(selectedCategory, quantity);
         alert(`Successfully unlocked ${quantity} of '${selectedCategory}'!`);
-  }
+   }
 }
-break;
+      break;
 
 function toggleDropdown() {
   if (content.style.display === "block") {
@@ -256,5 +254,5 @@ window.addEventListener("click", (event) => {
   if (!dropdown.contains(event.target)) {
     content.style.display = "none";
     content.classList.remove("visible");
-  }
+}
 });
