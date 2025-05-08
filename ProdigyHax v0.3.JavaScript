@@ -13,7 +13,7 @@ style.textContent = `
     color: white;
     padding: 12px;
     font-size: 18px;
-    border: 2px;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
