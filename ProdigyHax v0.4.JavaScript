@@ -1,4 +1,4 @@
-alert("Welcome to ProdigyHax v0.3");
+alert("Welcome to ProdigyHax v0.4");
 
 let toggleKey = prompt("Enter a single key to use for opening the dropdown (e.g., 'm'):");
 
@@ -20,8 +20,8 @@ style.textContent = `
     text-align: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: gradientAnimation 10s infinite; /* Smooth and fast */
-    background-size: 1000% 1000%; /* Expanded size for smoother color transitions */
+    animation: gradientAnimation 10s infinite; 
+    background-size: 1000% 1000%; 
   }
   .dropbtn:hover {
     transform: scale(1.05);
@@ -142,7 +142,7 @@ style.textContent = `
   }
 
   .dropdown-content.visible {
-    visibility: visible; /* Make visible only when fully positioned */
+    visibility: visible; 
   }
 
   .dropdown-content a {
@@ -181,7 +181,7 @@ dropdown.className = "dropdown";
 
 const button = document.createElement("button");
 button.className = "dropbtn";
-button.textContent = `Prodigy Hax v0.3 (press "${toggleKey}")`;
+button.textContent = `Prodigy Hax v0.4 (press "${toggleKey}")`;
 
 const content = document.createElement("div");
 content.className = "dropdown-content";
@@ -294,7 +294,6 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
              var _0x20c922 = 
                Boot.prototype.game._state._current.user.source.backpack;
 
-             // Process the selected category
              var all_items = _0x1d8024(
                _0x2c810e[_0x3cdd19],
                _0x3233ac === "currency"
