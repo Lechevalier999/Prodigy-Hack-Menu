@@ -221,14 +221,6 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
              "fossil",
              "item",
              "boots",
-             "spellRelic",
-             "currency",
-             "follow",
-             "mount",
-             "key",
-             "mathTownInterior",
-             "mathTownFrame",
-             "emote",
            ];
 
            var selectedCategory = prompt(
@@ -245,7 +237,7 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
              if (isNaN(quantity) || quantity <= 0) {
                alert("Invalid quantity. Please try again.");
              } else {
-               unlockCategoryItems(quantity, selectedCategory);
+               unlockCategoryItems(selectedCategory, quantity);
                alert(`Successfully unlocked ${quantity} of '${selectedCategory}'!`);
              }
            }
