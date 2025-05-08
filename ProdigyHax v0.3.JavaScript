@@ -39,7 +39,7 @@ style.textContent = `
     display: none;
     position: fixed;
     top: 50px;
-    left: 50%;
+    left: 0%;
     transform: translateX(0%);
     width: 100%;
     background: white;
