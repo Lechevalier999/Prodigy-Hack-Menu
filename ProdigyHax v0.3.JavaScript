@@ -29,7 +29,7 @@ style.textContent = `
   .dropdown {
     position: fixed;
     top: 10px;
-    left: 50%;
+    left: 100%;
     transform: translateX(-50%);
     width: auto;
     z-index: 9999;
@@ -39,7 +39,7 @@ style.textContent = `
     display: none;
     position: fixed;
     top: 50px;
-    left: 0%;
+    left: 50%;
     transform: translateX(0%);
     width: 100%;
     background: white;
