@@ -13,7 +13,7 @@ style.textContent = `
     color: white;
     padding: 12px;
     font-size: 18px;
-    border: none;
+    border: 2px;
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
@@ -29,8 +29,8 @@ style.textContent = `
   .dropdown {
     position: fixed;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0%;
+    transform: translateX(0);
     width: auto;
     z-index: 9999;
   }
