@@ -1,5 +1,7 @@
 # ProdigyHax
 Welcome to ProdigyHax this is a easy to use cheat menu for the math game Prodigy 
+the hack scripts are not made by me but I edited them so they work!
+Hack scripts credit: @rxzyx
 
 # Server-sided
 Get Gold, 
