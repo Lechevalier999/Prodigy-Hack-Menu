@@ -8,7 +8,7 @@ Get Gold,
 Get Item.
 
 # Client sided
-Free Membership (I'm trying to get it server sided)
+Free Membership (I'm trying to get it server sided but still gives benefits in said session which save)
 
 # How to setup the hack menu
 Copy the raw file code of ProdigyHax javascript file, Go on prodigy, Login and Select a world. 
