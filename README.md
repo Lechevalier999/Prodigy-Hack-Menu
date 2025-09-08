@@ -13,3 +13,6 @@ Free Membership (I'm trying to get it server sided but still gives benefits in s
 # How to setup the hack menu
 Copy the raw file code of ProdigyHax javascript file, Go on prodigy, Login and Select a world. 
 Once you fully load in, open the browser console with either ctrl-shift-j or ctrl-shift-i and paste the script into the console with ctrl-v then press enter fill out the prompts then close the console and your good to go!
+
+# Newest updates
+Added space for more cheats that looks better xd
