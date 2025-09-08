@@ -130,7 +130,7 @@ style.textContent = `
     top: 50px;
     left: 0%;
     transform: translateX(0%);
-    width: 100%;
+    width: 1000%;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
