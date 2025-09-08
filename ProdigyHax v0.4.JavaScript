@@ -16,7 +16,7 @@ style.textContent = `
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 100%;
+    width: 1000%;
     text-align: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
