@@ -16,12 +16,12 @@ style.textContent = `
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 1000%;
+    width: 500%;
     text-align: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: gradientAnimation 10s infinite; 
-    background-size: 10000% 10000%; 
+    background-size: 1000% 1000%; 
   }
   .dropbtn:hover {
     transform: scale(1.05);
@@ -118,7 +118,7 @@ style.textContent = `
   .dropdown {
     position: fixed;
     top: 10px;
-    left: 50%;
+    left: 10%;
     transform: translateX(-50%);
     width: auto;
     z-index: 9999;
@@ -129,8 +129,8 @@ style.textContent = `
     position: fixed;
     top: 50px;
     left: 0%;
-    transform: translateX(0%);
-    width: 1000%;
+    transform: translateX(-0%);
+    width: 100%;
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
