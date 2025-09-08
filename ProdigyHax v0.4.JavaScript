@@ -21,7 +21,7 @@ style.textContent = `
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: gradientAnimation 10s infinite; 
-    background-size: 1000% 1000%; 
+    background-size: 10000% 10000%; 
   }
   .dropbtn:hover {
     transform: scale(1.05);
