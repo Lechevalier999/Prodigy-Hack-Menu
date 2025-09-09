@@ -16,3 +16,6 @@ Once you fully load in, open the browser console with either ctrl-shift-j or ctr
 
 # Newest updates
 Added space for more cheats that looks better xd
+
+# Found a admin permission vulnerability 
+Will be making a hack if its useful
