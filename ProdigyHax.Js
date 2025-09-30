@@ -1,6 +1,6 @@
-alert("Welcome to ProdigyHax (v0.5)");
+ualert("Welcome to ProdigyHax (v0.5)");
 
-let toggleKey = prompt("Enter a single key to use for opening the dropdown (e.g., 'm'):");
+let toggleKey = prompt("Enter a single key to use for opening the menu (e.g., 'm'):");
 
 if (!toggleKey || toggleKey.length !== 1) {
   alert("Invalid key. Using default key 'm'.");
