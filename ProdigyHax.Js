@@ -1,4 +1,4 @@
-alert("Welcome to ProdigyHax v0.4");
+alert("Welcome to ProdigyHax (v0.5)");
 
 let toggleKey = prompt("Enter a single key to use for opening the dropdown (e.g., 'm'):");
 
