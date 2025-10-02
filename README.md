@@ -12,3 +12,4 @@ Added space for more cheats so that it looks better xd
 
 # Bug
 Theres a bug in  the give item code that makes the given quantity of every item in a category the name of the category example "Robe" and the amount is "outfits" could somebody fix it please :D
+
