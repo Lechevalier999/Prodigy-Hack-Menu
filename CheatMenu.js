@@ -1,4 +1,4 @@
-ualert("Welcome to ProdigyHax (v0.5)");
+alert("Welcome to ProdigyHax (v0.5)");
 
 let toggleKey = prompt("Enter a single key to use for opening the menu (e.g., 'm'):");
 
