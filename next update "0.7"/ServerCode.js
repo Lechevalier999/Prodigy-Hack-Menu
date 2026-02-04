@@ -1,3 +1,5 @@
+
+
 let getGold = Cheat1;
 let freeMembership = Cheat2;
 let give magicoin = Cheat4;
