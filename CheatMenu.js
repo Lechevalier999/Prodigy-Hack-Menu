@@ -1,12 +1,17 @@
 alert("Welcome to ProdigyHax (v0.5)");
-
-let toggleKey = prompt("Enter a single key to use for opening the menu (e.g., 'm'):");
+let exitkey = "X"
+let toggleKey = prompt("Enter a single key to use for opening the dropdown menu (e.g., 'm'):");
 
 if (!toggleKey || toggleKey.length !== 1) {
   alert("Invalid key. Using default key 'm'.");
   toggleKey = "m";
 }
-const style = document.createElement("style");
+
+alert("to hide the menu completely please press shift and x at the same time");
+
+let menuvisibility = "visible"
+
+let style = document.createElement("style");
 style.textContent = `
   .dropbtn {
     background: linear-gradient(90deg, #ff7f50, #1e90ff, #32cd32, #ff1493, #ffa500);
@@ -22,6 +27,7 @@ style.textContent = `
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: gradientAnimation 10s infinite; 
     background-size: 1000% 1000%; 
+    visibility = menuvisibility;
   }
   .dropbtn:hover {
     transform: scale(1.05);
@@ -122,6 +128,7 @@ style.textContent = `
     transform: translateX(-50%);
     width: auto;
     z-index: 9999;
+    visibility: visible;
   }
 
   .dropdown-content {
@@ -367,3 +374,6 @@ window.addEventListener("click", (event) => {
     content.classList.remove("visible");
   }
 });  
+
+function hidemenu() {
+}
