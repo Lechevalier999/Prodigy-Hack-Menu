@@ -7,9 +7,12 @@ the hack scripts are not made by me but I edited them so they work!
 Copy the raw file code of ProdigyHax javascript file (CheatMenu.js), Go on prodigy, Login and Select a world. 
 Once you fully load in, open the browser console with either ctrl-shift-j or ctrl-shift-i and paste the script into the console with ctrl-v then press enter fill out the prompts then close the console and your good to go! If it does not let you paste type "allow pasting" enter this then paste the script again.
 
-# Newest updates
-Added space for more cheats so that it looks better xd
+# Change Log
+Feb 4 2026
+ProdigyHax | Updated Version 0.5 => Version 0.6
+1. added a robust "hide menu completely / restore" feature.
+2. cleaned/beautified code.
 
-# Bug
-Theres a bug in  the give item code that makes the given quantity of every item in a category the name of the category example "Robe" and the amount is "outfits" could somebody fix it please :D
+# Future plans
+Gonna be making it pull from a replit server of mine to decrease menu script size to prevent lg for smaller pc's and also allow my neural network to find new ways to exploit in prodigy
 
