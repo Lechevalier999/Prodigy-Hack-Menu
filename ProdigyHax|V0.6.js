@@ -1,4 +1,9 @@
-alert("Welcome to ProdigyHax (v0.5)");
+// ProdigyHax | Updated Version 0.5 => Version 0.6
+// |Change Log|
+// 1. added a robust "hide menu completely / restore" feature.
+// 2. cleaned/beautified code.
+
+alert("Welcome to ProdigyHax (v0.6)");
 let exitkey = "X"
 let toggleKey = prompt("Enter a single key to use for opening the dropdown menu (e.g., 'm'):");
 
@@ -9,147 +14,67 @@ if (!toggleKey || toggleKey.length !== 1) {
 
 alert("to hide the menu completely please press shift and x at the same time");
 
-let menuvisibility = "visible"
+const LS_HIDDEN_KEY = "ProdigyHax_menu_hidden";
+let menuFullyHidden = localStorage.getItem(LS_HIDDEN_KEY) === "true";
 
 let style = document.createElement("style");
 style.textContent = `
   .dropbtn {
     background: linear-gradient(90deg, #ff7f50, #1e90ff, #32cd32, #ff1493, #ffa500);
     color: white;
-    padding: 12px;
+    padding: 12px 18px;
     font-size: 18px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    width: 500%;
     text-align: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: gradientAnimation 10s infinite; 
-    background-size: 1000% 1000%; 
-    visibility = menuvisibility;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background-size: 400% 400%;
+    animation: gradientAnimation 10s linear infinite;
   }
   .dropbtn:hover {
-    transform: scale(1.05);
+    transform: scale(1.03);
     box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
   }
 
   @keyframes gradientAnimation {
-    0% {
-      background-position: 0% 50%;
-      background: gradient(90deg, #ff7f50, #1e90ff, #32cd32, #ff1493, #ffa500);
-    }
-    5% {
-      background-position: 5% 50%;
-      background: gradient(90deg, #1e90ff, #32cd32, #ff1493, #ffa500, #ff7f50);
-    }
-    10% {
-      background-position: 10% 50%;
-      background: gradient(90deg, #32cd32, #ff1493, #ffa500, #ff7f50, #1e90ff);
-    }
-    15% {
-      background-position: 15% 50%;
-      background: gradient(90deg, #ff1493, #ffa500, #ff7f50, #1e90ff, #32cd32);
-    }
-    20% {
-      background-position: 20% 50%;
-      background: gradient(90deg, #ffa500, #ff7f50, #1e90ff, #32cd32, #ff1493);
-    }
-    25% {
-      background-position: 25% 50%;
-      background: gradient(90deg, #ff7f50, #1e90ff, #32cd32, #ff1493, #ffa500);
-    }
-    30% {
-      background-position: 30% 50%;
-      background: gradient(90deg, #1e90ff, #32cd32, #ff1493, #ffa500, #ff7f50);
-    }
-    35% {
-      background-position: 35% 50%;
-      background: gradient(90deg, #32cd32, #ff1493, #ffa500, #ff7f50, #1e90ff);
-    }
-    40% {
-      background-position: 40% 50%;
-      background: gradient(90deg, #ff1493, #ffa500, #ff7f50, #1e90ff, #32cd32);
-    }
-    45% {
-      background-position: 45% 50%;
-      background: gradient(90deg, #ffa500, #ff7f50, #1e90ff, #32cd32, #ff1493);
-    }
-    50% {
-      background-position: 50% 50%;
-      background: gradient(90deg, #ff7f50, #1e90ff, #32cd32, #ff1493, #ffa500);
-    }
-    55% {
-      backround-position: 55% 50%;
-      backround: gradient(90deg, #fc19c5, #f119fc, #fc19b7, #fc1991, #fc1961);
-    }
-    60% {
-      backround-position: 60% 50%;
-      backround: gradient(90deg, #fc1935, #f7505f, #fo4d2d, #f0762d, #fffa52);
-    }
-    65% {
-      backround-position: 65% 50%;
-      backround: gradient(90deg, #f3f92a, #cefc16, #b5f712, #82f303, #59ff00);
-    }
-    70% {
-      backround-position: 70% 50%;
-      backround: radient(90deg, #88f26e, #69ff9d, #69b8ff, #b3eeefa, #b3fae0);
-    }
-    75% {
-      backround-position: 75% 50%;
-      backround: gradient(90deg, #dcfee6, #c7ffe2, #e6fff2, #ffd1fd, #fec1c9);
-    }
-    80% {
-      backround-position: 80% 50%;
-      backround: gradient(90deg, #fea3ae, #ff566b, #ff1935, #ffffb3, #16f431);
-    }
-    85% {
-      backround-position: 85% 50%;
-      backround: gradient(90deg, #0bf528, #41ff58, #21fe7b, #21fafe, #f700fa);
-    }
-    90% {
-      backround-position: 90% 50%;
-      backround: gradient(90deg, #00affa, #67d1ff, #a5e2fc, #ceeaf6, #5afff3);
-    }
-    95% {
-      backround-position: 95% 50%;
-      backround: gradient(90deg, #ff5050, #f83131, #f9ff42, #95ff42, #42ffbd);
-    }
-    100% {
-      backround-position: 100% 50%;
-      backround: gradient(90deg, #ff42da, #ff426a, #97ff21, #05fa9d, #fa05e7);
-    }
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
   .dropdown {
     position: fixed;
     top: 10px;
-    left: 10%;
+    left: 50%;
     transform: translateX(-50%);
-    width: auto;
-    z-index: 9999;
-    visibility: visible;
+    z-index: 999999;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 
   .dropdown-content {
     display: none;
-    position: fixed;
-    top: 50px;
-    left: 0%;
-    transform: translateX(-0%);
-    width: 100%;
-    background: white;
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 280px;
+    max-width: 90vw;
+    background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
-    z-index: 9999;
-    animation: fadeIn 0.3s ease-in-out;
-    visibility: hidden; /* Initially hidden */
+    box-shadow: 0px 6px 12px rgba(0,0,0,0.15);
+    animation: fadeIn 0.18s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .dropdown-content.visible {
-    visibility: visible; 
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .dropdown-content a {
@@ -158,8 +83,8 @@ style.textContent = `
     text-decoration: none;
     display: block;
     text-align: center;
-    background: linear-gradient(90deg, #ffffff, #f0f0f0);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    background: linear-gradient(180deg, #ffffff, #f7f7f8);
+    transition: background-color 0.18s ease, color 0.18s ease;
   }
   .dropdown-content a:hover {
     background: #3498db;
@@ -167,18 +92,8 @@ style.textContent = `
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .dropdown-content a:not(:last-child) {
-    border-bottom: 1px solid #ddd;
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 `;
 document.head.appendChild(style);
@@ -188,6 +103,7 @@ dropdown.className = "dropdown";
 
 const button = document.createElement("button");
 button.className = "dropbtn";
+button.type = "button";
 button.textContent = `Prodigy Hax v0.4 (press "${toggleKey}")`;
 
 const content = document.createElement("div");
@@ -200,18 +116,25 @@ options.forEach(option => {
   const link = document.createElement("a");
   link.href = "#";
   link.textContent = option;
-
   link.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default action (e.g., page reload)
-    handleOptionClick(option); // Call function for the selected option
+    event.preventDefault();
+    handleOptionClick(option);
   });
-
   content.appendChild(link);
 });
 
 dropdown.appendChild(button);
 dropdown.appendChild(content);
 document.body.appendChild(dropdown);
+
+function applyHiddenState() {
+  if (menuFullyHidden) {
+    dropdown.style.display = "none";
+  } else {
+    dropdown.style.display = "";
+  }
+}
+applyHiddenState();
 
 function handleOptionClick(option) {
    switch (option) {
@@ -344,36 +267,69 @@ function _0x2ee08b(_0x10c056,_0x10d91e,_0x3dbffc,_0x3ced82,_0x2138e5){return _0x
        }
      }
 
+function openDropdown() {
+  if (menuFullyHidden) return;
+  content.style.display = "block";
+  setTimeout(() => content.classList.add("visible"), 0);
+}
+function closeDropdown() {
+  content.classList.remove("visible");
+  setTimeout(() => {
+    if (!content.classList.contains("visible")) content.style.display = "none";
+  }, 200);
+}
 function toggleDropdown() {
-  if (content.style.display === "block") {
-    content.style.display = "none";
-    content.classList.remove("visible");
-  } else {
-    content.style.display = "block";
-    // Use a timeout to ensure rendering is complete before making it visible
-    setTimeout(() => {
-      content.classList.add("visible");
-    }, 0);
-  }
+  if (menuFullyHidden) return;
+  if (content.classList.contains("visible")) closeDropdown();
+  else openDropdown();
 }
 
 button.addEventListener("click", (e) => {
-  e.stopPropagation(); // Prevents the event from bubbling up
+  e.stopPropagation();
   toggleDropdown();
 });
 
+function setMenuFullyHidden(hidden) {
+  menuFullyHidden = !!hidden;
+  localStorage.setItem(LS_HIDDEN_KEY, menuFullyHidden ? "true" : "false");
+  applyHiddenState();
+
+  if (!menuFullyHidden) {
+    button.textContent = `Prodigy Hax v0.4 (press "${toggleKey}")`;
+  } else {
+    button.textContent = `Prodigy Hax (hidden)`;
+  }
+}
+
+function toggleFullHide() {
+  setMenuFullyHidden(!menuFullyHidden);
+  console.log("Prodigy Hax menu fullyHidden =", menuFullyHidden);
+}
+
 window.addEventListener("keydown", (e) => {
-  if (e.key.toLowerCase() === toggleKey.toLowerCase()) {
+  if (e.shiftKey && e.key && e.key.toLowerCase() === exitkey.toLowerCase()) {
+    e.preventDefault();
+    toggleFullHide();
+    return;
+  }
+  if (menuFullyHidden) return;
+
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  if (e.key && e.key.toLowerCase() === toggleKey.toLowerCase()) {
+    e.preventDefault();
     toggleDropdown();
   }
 });
 
 window.addEventListener("click", (event) => {
   if (!dropdown.contains(event.target)) {
-    content.style.display = "none";
-    content.classList.remove("visible");
+    closeDropdown();
   }
-});  
+});
 
-function hidemenu() {
-}
+window.ProdigyHax = window.ProdigyHax || {};
+window.ProdigyHax.toggleFullHide = toggleFullHide;
+window.ProdigyHax.open = openDropdown;
+window.ProdigyHax.close = closeDropdown;
+window.ProdigyHax.isHidden = () => menuFullyHidden;
