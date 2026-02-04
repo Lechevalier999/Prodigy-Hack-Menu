@@ -14,5 +14,5 @@ ProdigyHax | Updated Version 0.5 => Version 0.6
 2. cleaned/beautified code.
 
 # Future plans
-Gonna be making it pull from a replit server of mine to decrease menu script size to prevent lg for smaller pc's and also allow my neural network to find new ways to exploit in prodigy
+Gonna be making it pull from a replit server of mine to decrease menu script size to prevent lag for potato pc's/laptops and also allow my neural network to find new ways to exploit in prodigy
 
