@@ -1,0 +1,28 @@
+
+    
+        ((function () {
+            var originalClearTimeout = window.clearTimeout.bind(window);
+            var originalClearInterval = window.clearInterval.bind(window);
+            var wvb = ["hack"];
+            var length = wvb.length;
+
+            var protectedId = setInterval(() => {
+                for (var i = 0; i < length; ++i) {
+                    if (wvb[i] in window) {
+                        window.location = '/404';
+                    }
+                }
+            }, 1000);
+
+            window.clearInterval = function (id) {
+                if (id == protectedId) return;
+                return originalClearInterval(id);
+            }
+
+            window.clearTimeout = function (id) {
+                if (id == protectedId) return;
+                return originalClearTimeout(id);
+            }
+        })());
+    
+    
