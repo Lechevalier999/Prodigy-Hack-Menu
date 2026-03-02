@@ -1,38 +1,11 @@
-// =========================
-// SAFE GETTER (prevents undefined)
-// =========================
-function safeGet(path, fallback = "Not loaded") {
-    try {
-        const value = path();
-        return value !== undefined ? value : fallback;
-    } catch {
-        return fallback;
-    }
-}
-
-// =========================
-// CONSTANTS (now always defined)
-// =========================
-const gameData = 
-    Boot.prototype.game._state._states.get("Boot")._gameData;
-
+const gameData = Boot.prototype.game._state._states.get("Boot")._gameData;
 const backpack = Boot.prototype.game._state._current.user.source.backpack;
-
 const outfit = Boot.prototype.game._state._current.user.source.backpack.outfit;
 
-
-
-
-// =========================
-// DEBUG LOGS (never undefined)
-// =========================
 console.log("Game Data:", gameData);
 console.log("Backpack:", backpack);
 console.log("Outfit:", outfit);
 
-// =========================
-// CHEAT FUNCTIONS
-// =========================
 function addGold() {
     let amount = parseInt(prompt("How much gold do you want?").replaceAll(",", ""));
     if (!Number.isNaN(amount) && Number.isFinite(amount)) {
